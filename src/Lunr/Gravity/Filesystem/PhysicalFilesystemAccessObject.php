@@ -21,6 +21,7 @@ use RegexIterator;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use RuntimeException;
+use Exception;
 use LogicException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -314,6 +315,36 @@ class PhysicalFilesystemAccessObject implements DataAccessObjectInterface, Files
             $this->logger->warning('{message}', $context);
             return FALSE;
         }
+    }
+
+    /**
+     * Turns the values of an array into csv and writes them in a given file.
+     *
+     * @param  String $file      The filepath to write the file
+     * @param  Array $data       An array with the data to be turned into csv
+     * @param  String $delimiter The delimiter for the csv (optional)
+     * @param  String $enclosure The enclosure for the csv (optional)
+     *
+     * @return Boolean TRUE when file is created and FALSE in failure.
+     */
+    public function put_csv_file_content($file, $data, $delimiter = ',', $enclosure = '"')
+    {
+        $fp = fopen($file, 'w');
+
+        if($fp === FALSE)
+        {
+            $this->logger->warning('Could not open the file: ' . $file);
+            return FALSE;
+        }
+
+        foreach ($data as $fields)
+        {
+            fputcsv($fp, $fields, $delimiter, $enclosure);
+        }
+
+        fclose($fp);
+
+        return TRUE;
     }
 
 }
