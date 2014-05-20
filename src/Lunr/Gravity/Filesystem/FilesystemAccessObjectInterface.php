@@ -94,6 +94,16 @@ interface FilesystemAccessObjectInterface
      */
     public function rmdir($dir_path);
 
+    /**
+     * Checks if the given file exists and it matches the requested filetype criteria.
+     *
+     * @param Mixed  $file String filepath or resource
+     * @param String $type The file type flag
+     *
+     * @return Boolean TRUE in file existence and match otherwise FALSE
+     */
+    public function file_exists($file, $type = 'e');
+
 }
 
 ?>

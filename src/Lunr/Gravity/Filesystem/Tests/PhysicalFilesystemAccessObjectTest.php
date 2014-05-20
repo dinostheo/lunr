@@ -21,6 +21,7 @@ use Psr\Log\LoggerInterface;
 use Lunr\Halo\LunrBaseTest;
 use ReflectionClass;
 use stdClass;
+use Lunr\Gravity\Filesystem\FileFlags;
 
 /**
  * This class contains common constructors/destructors and data providers
@@ -141,6 +142,54 @@ abstract class PhysicalFilesystemAccessObjectTest extends LunrBaseTest
         $filepath[] = [new stdClass(), 'RecursiveDirectoryIterator::__construct() expects parameter 1 to be string, object given'];
 
         return $filepath;
+    }
+
+    /**
+     * Unit test data provider for files_exists check.
+     *
+     * @return array $flag Array of file exist flags
+     */
+    public function fileExistsFlagProvider()
+    {
+        $flag   = [];
+        $flag[] = ['a'];
+        $flag[] = [FileFlags::FILE_EXISTS];
+
+        return $flag;
+    }
+
+    /**
+     * Unit test data provider for files_exists checks using filetype.
+     *
+     * @return array $filetype Array of pairs flags and filetypes
+     */
+    public function fileExistsFiletypeProvider()
+    {
+        $filetype   = [];
+        $filetype[] = [FileFlags::BLOCK_SPECIAL_FILE, 'block'];
+        $filetype[] = [FileFlags::CHAR_SPECIAL_FILE, 'char'];
+        $filetype[] = [FileFlags::DIRECTORY_FILE, 'dir'];
+        $filetype[] = [FileFlags::REGULAR_FILE, 'file'];
+        $filetype[] = [FileFlags::SYMBOLIC_LINK_FILE, 'link'];
+        $filetype[] = ['L', 'link'];
+        $filetype[] = [FileFlags::NAMED_PIPE_FILE, 'fifo'];
+
+        return $filetype;
+    }
+
+    /**
+     * Unit test data provider for files_exists permission checks.
+     *
+     * @return array $permission Array of pairs flags and permissions
+     */
+    public function fileExistsPermissionProvider()
+    {
+        $permission   = [];
+        $permission[] = [FileFlags::READABLE_FILE, 'is_readable'];
+        $permission[] = [FileFlags::WRITABLE_FILE, 'is_writable'];
+        $permission[] = [FileFlags::EXECUTABLE_FILE, 'is_executable'];
+
+        return $permission;
     }
 
 }

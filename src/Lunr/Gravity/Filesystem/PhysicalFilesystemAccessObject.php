@@ -316,6 +316,69 @@ class PhysicalFilesystemAccessObject implements DataAccessObjectInterface, Files
         }
     }
 
+    /**
+     * Checks if the given file exists and it matches the requested filetype criteria.
+     *
+     * @param Mixed  $file String filepath or resource
+     * @param String $type The file type flag
+     *
+     * @return Boolean TRUE in file existence and match otherwise FALSE
+     */
+    public function file_exists($file, $type = 'e')
+    {
+        switch($type)
+        {
+            case FileFlags::FILE_EXISTS:
+            case 'a':
+                return file_exists($file);
+            case FileFlags::BLOCK_SPECIAL_FILE:
+                return filetype($file) === 'block';
+            case FileFlags::CHAR_SPECIAL_FILE:
+                return filetype($file) === 'char';
+            case FileFlags::DIRECTORY_FILE:
+                return filetype($file) === 'dir';
+            case FileFlags::REGULAR_FILE:
+                return filetype($file) === 'file';
+            case FileFlags::SYMBOLIC_LINK_FILE:
+            case 'L':
+                return filetype($file) === 'link';
+            case FileFlags::NAMED_PIPE_FILE:
+                return filetype($file) === 'fifo';
+            case FileFlags::READABLE_FILE:
+                return is_readable($file) === TRUE;
+            case FileFlags::WRITABLE_FILE:
+                return is_writable($file) === TRUE;
+            case FileFlags::EXECUTABLE_FILE:
+                return is_executable($file) === TRUE;
+            case FileFlags::SET_GROUP_ID_FILE:
+                $gid = stat($file)['gid'];
+                return isset($gid) && isset(posix_getgrgid($gid)['name']);
+            case FileFlags::EFFECTIVE_GROUP_FILE:
+                $gid = stat($file)['gid'];
+                return isset($gid) && $gid === posix_getegid();
+            case FileFlags::SET_USER_ID_FILE:
+                $uid = stat($file)['uid'];
+                return isset($uid) && isset(posix_getpwuid($uid)['name']);
+            case FileFlags::EFFECTIVE_USER_FILE:
+                $uid = stat($file)['uid'];
+                return isset($uid) && $uid === posix_geteuid();
+            case FileFlags::GT_ZERO_SIZE_FILE:
+                $size = stat($file)['size'];
+                return isset($size) && $size > 0;
+            case FileFlags::TERMINAL_FILE_DESCRIPTOR:
+                return posix_isatty($file);
+            case FileFlags::MODIFIED_SINCE_LAST_READ:
+                $stats = stat($file);
+                return $stats['atime'] < $stats['mtime'];
+            case FileFlags::SOCKET_FILE:
+                return fstat($file)['mode'] === 140000;
+            default:
+                break;
+        }
+
+        return FALSE;
+    }
+
 }
 
 ?>
